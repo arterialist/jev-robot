@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a simulator, controller, or browser problem.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include enough detail to reproduce the problem. Remove API keys, tokens, and private model responses from logs.
+        Report security vulnerabilities through the Security tab, not a public issue.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the launch command, selected control mode, goal, and any self-thought or movement input.
+      placeholder: |
+        1. Run uv run jev-robot-web --offline
+        2. Select Full control
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Model mode
+      options:
+        - Offline
+        - Live JEV and Gemini
+        - Live with one or both model loops falling back
+        - Other or unsure
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS version, CPU architecture, Python version, browser if relevant, and git commit.
+      placeholder: macOS 15, Apple Silicon, Python 3.12, Chrome, commit ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, screenshot, or recording
+      description: Include the traceback or visible status. A fall alone may be a controller limitation, so include what led to it.

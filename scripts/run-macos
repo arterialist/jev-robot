@@ -1,0 +1,13 @@
+#!/bin/zsh
+set -euo pipefail
+
+uv sync --quiet
+
+python_lib_dir=$(uv run python -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')
+if [[ -n "${DYLD_FALLBACK_LIBRARY_PATH:-}" ]]; then
+  export DYLD_FALLBACK_LIBRARY_PATH="${python_lib_dir}:${DYLD_FALLBACK_LIBRARY_PATH}"
+else
+  export DYLD_FALLBACK_LIBRARY_PATH="${python_lib_dir}"
+fi
+
+exec uv run mjpython -m jev_robot "$@"

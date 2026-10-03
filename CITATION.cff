@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software in research, cite this repository and the specific version or commit."
+type: software
+title: "JEV robot"
+authors:
+  - family-names: "arterialist"
+repository-code: "https://github.com/arterialist/jev-robot"
+url: "https://github.com/arterialist/jev-robot"
+version: "0.1.0"
+date-released: "2026-10-03"
+license: MIT
+abstract: "A simulated Unitree G1 with JEV reflex decisions, Gemini planning, and a browser control room."
+keywords:
+  - robotics
+  - MuJoCo
+  - Unitree G1
+  - JEV
+  - Gemini

@@ -1,0 +1,13 @@
+[
+  {"name": "bug", "color": "d73a4a", "description": "Something does not work as documented"},
+  {"name": "enhancement", "color": "a2eeef", "description": "A new capability or behavior change"},
+  {"name": "documentation", "color": "0075ca", "description": "Documentation, examples, or project visuals"},
+  {"name": "dependencies", "color": "0366d6", "description": "Python packages or GitHub Actions updates"},
+  {"name": "infrastructure", "color": "5319e7", "description": "CI, packaging, or development tools"},
+  {"name": "simulation", "color": "1d76db", "description": "MuJoCo physics, assets, or locomotion"},
+  {"name": "models", "color": "7057ff", "description": "JEV, Gemini, and local fallback behavior"},
+  {"name": "interface", "color": "0e8a16", "description": "Browser controls, camera views, and live trace"},
+  {"name": "good first issue", "color": "7057ff", "description": "A scoped task suitable for a first contribution"},
+  {"name": "help wanted", "color": "008672", "description": "The maintainer would welcome a contribution"},
+  {"name": "skip-changelog", "color": "ededed", "description": "Omit this pull request from generated release notes"}
+]

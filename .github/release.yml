@@ -1,0 +1,14 @@
+changelog:
+  exclude:
+    labels: [skip-changelog]
+  categories:
+    - title: Robot and interface changes
+      labels: [enhancement]
+    - title: Fixes
+      labels: [bug]
+    - title: Documentation
+      labels: [documentation]
+    - title: Dependencies and automation
+      labels: [dependencies, infrastructure]
+    - title: Other changes
+      labels: ["*"]

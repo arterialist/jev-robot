@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.12.8"
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.12", "3.13"]
+        include:
+          - os: macos-latest
+            python: "3.12"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --frozen
+      - name: Run offline unit tests
+        run: uv run --frozen python -m unittest discover -s tests -v
+      - name: Install Linux rendering libraries
+        if: runner.os == 'Linux' && matrix.python == '3.12'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libegl1 libegl-mesa0 libgl1
+      - name: Run the offline simulator
+        if: runner.os == 'Linux' && matrix.python == '3.12'
+        env:
+          MUJOCO_GL: egl
+        run: uv run --frozen jev-robot --headless --offline --seconds 2 --no-realtime --capture "$RUNNER_TEMP/g1-smoke.png"
+      - name: Save the smoke-test frame
+        if: runner.os == 'Linux' && matrix.python == '3.12'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: offline-simulation-frame
+          path: ${{ runner.temp }}/g1-smoke.png
+          if-no-files-found: error
+          retention-days: 14
+
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: "3.12"
+      - name: Build source and wheel distributions
+        run: uv build --no-sources
+      - name: Check the packaged browser assets
+        run: |
+          uv run --no-project --python 3.12 python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          wheel, = Path("dist").glob("*.whl")
+          required = {
+              "jev_robot/static/index.html",
+              "jev_robot/static/control-room.css",
+              "jev_robot/static/control-room.js",
+          }
+          with ZipFile(wheel) as archive:
+              missing = required.difference(archive.namelist())
+          if missing:
+              raise SystemExit(f"Wheel is missing browser assets: {sorted(missing)}")
+          print(f"Verified browser assets in {wheel.name}")
+          PY
+      - name: Save distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14

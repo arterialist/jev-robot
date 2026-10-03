@@ -1,0 +1,54 @@
+{
+  "run_command": "uv run jev-robot-web --offline --no-open --port 8000",
+  "camera_view": "follow",
+  "offline": true,
+  "motor_action": "stand",
+  "model_sources": {
+    "jev": "fallback",
+    "gemini": "fallback"
+  },
+  "simulation_time": 63.700000000031885,
+  "fallen": false,
+  "metrics": {
+    "physics_hz": 500,
+    "physics_timestep_hz": 500,
+    "sensory_hz": 50,
+    "render_fps": 14.7,
+    "system_one_hz": 0.0,
+    "system_two_hz": 0.0,
+    "actuator_count": 29,
+    "sim_speed": 1.0,
+    "queue_depth": 1,
+    "superseded": 3,
+    "reflex_lag": 0.020000000000024443
+  },
+  "images": {
+    "control-room.png": {
+      "source": "CUA browser full-page screenshot",
+      "dimensions": [
+        1280,
+        1283
+      ],
+      "camera": "arena"
+    },
+    "g1-arena.png": {
+      "source": "First complete JPEG frame from local MJPEG stream, saved as PNG",
+      "dimensions": [
+        960,
+        540
+      ],
+      "camera": "follow"
+    },
+    "social-preview.png": {
+      "source": "Direct 1280x640 MuJoCo render from the local offline runtime telemetry pose; root orientation reconstructed from reported roll, pitch and yaw, and all joint positions restored",
+      "dimensions": [
+        1280,
+        640
+      ],
+      "camera": "follow",
+      "simulation_time": 172.52600000009568,
+      "offline": true,
+      "fallen": false
+    }
+  }
+}

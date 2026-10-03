@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and demo discussion
+    url: https://github.com/arterialist/jev-robot/discussions
+    about: Ask about setup, control behavior, or experiment ideas.
+  - name: Report a security vulnerability
+    url: https://github.com/arterialist/jev-robot/security/advisories/new
+    about: Send a private report without exposing credentials or vulnerability details in public.

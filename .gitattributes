@@ -1,0 +1,20 @@
+* text=auto eol=lf
+*.py text
+*.sh text
+*.md text
+*.toml text
+*.lock text
+*.yml text
+*.yaml text
+*.json text
+*.html text
+*.css text
+*.js text
+*.svg text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.mp4 binary
+*.onnx binary

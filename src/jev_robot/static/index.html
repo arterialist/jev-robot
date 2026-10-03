@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>JEV Robot Control Room</title>
+    <link rel="stylesheet" href="/static/control-room.css?v=control-modes-1" />
+    <script src="/static/control-room.js?v=continuous-control-1" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="identity">
+        <span class="wordmark">CORTEX</span>
+        <span class="machine">UNITREE G1 // MUJOCO</span>
+      </div>
+      <div class="connection" role="status" aria-live="polite">
+        <span class="status-mark" id="connection-mark" aria-hidden="true"></span>
+        <span id="connection-label">Connecting to robot</span>
+      </div>
+    </header>
+
+    <main class="control-grid">
+      <section class="stage-column" aria-labelledby="stage-title">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Live arena</p>
+            <h1 id="stage-title">The world</h1>
+          </div>
+          <div class="action-readout">
+            <span>Active motion</span>
+            <strong id="active-action">STAND</strong>
+          </div>
+        </div>
+
+        <div class="control-mode-bar">
+          <div>
+            <p class="kicker">Motor mode</p>
+            <p id="control-mode-description">JEV steers continuous travel and shapes all 29 joints. The local gait policy handles foot timing and balance.</p>
+          </div>
+          <div class="control-mode-switch" role="group" aria-label="JEV control mode">
+            <button type="button" data-control-mode="direct" aria-pressed="true">Full control</button>
+            <button type="button" data-control-mode="primitives" aria-pressed="false">Primitives</button>
+          </div>
+        </div>
+
+        <div class="world-grid">
+          <figure class="simulation-stage">
+            <img
+              src="/stream.mjpeg"
+              alt="Live MuJoCo simulation of the Unitree G1 moving through the arena"
+            />
+            <div class="camera-switch" role="group" aria-label="Camera view">
+              <button type="button" data-camera="arena" aria-pressed="true">Arena</button>
+              <button type="button" data-camera="follow" aria-pressed="false">Follow</button>
+              <button type="button" data-camera="top" aria-pressed="false">Top</button>
+              <button type="button" data-camera="fpv" aria-pressed="false">FPV</button>
+            </div>
+            <figcaption>
+              <span id="sim-clock">T+000.00</span>
+              <span id="goal-count">GOAL 1</span>
+              <span id="robot-position">POS 0.00 / 0.00 / 0.00</span>
+            </figcaption>
+          </figure>
+          <section class="arena-panel" aria-labelledby="arena-title">
+            <div class="arena-heading">
+              <div>
+                <p class="kicker">Interactive map</p>
+                <h2 id="arena-title">Pick a goal</h2>
+              </div>
+              <span class="map-key">ROBOT ● &nbsp; GOAL ◉</span>
+            </div>
+            <svg id="arena-map" viewBox="0 0 460 340" preserveAspectRatio="none" role="img" aria-label="Top-down arena map. Click clear floor to move the green goal."></svg>
+            <p id="goal-status" class="goal-status" aria-live="polite">Click a clear spot to move the goal. The robot will not reset.</p>
+          </section>
+        </div>
+
+        <dl class="metric-strip" aria-label="Live loop metrics">
+          <div>
+            <dt>Physics steps</dt>
+            <dd><span id="physics-hz">0</span> Hz <small>/ <span id="physics-target-hz">500</span> target</small></dd>
+          </div>
+          <div>
+            <dt>Sensory events</dt>
+            <dd><span id="sensory-hz">0</span> Hz <small>/ 50 target</small></dd>
+          </div>
+          <div>
+            <dt>JEV throughput</dt>
+            <dd><span id="system-one-hz">0.0</span> Hz</dd>
+          </div>
+          <div>
+            <dt>Gemini plans</dt>
+            <dd><span id="system-two-hz">0.00</span> Hz <small>/ 0.20 target</small></dd>
+          </div>
+          <div>
+            <dt>Scene frames</dt>
+            <dd><span id="render-fps">0.0</span> fps <small>/ 15 target</small></dd>
+          </div>
+          <div>
+            <dt>Decision age (sim)</dt>
+            <dd><span id="reflex-lag">0</span> ms</dd>
+          </div>
+          <div>
+            <dt>Stale events cut</dt>
+            <dd id="superseded">0</dd>
+          </div>
+          <div>
+            <dt>Target</dt>
+            <dd><span id="target-distance">0.00</span> m</dd>
+          </div>
+        </dl>
+
+        <section class="thought-console" aria-labelledby="thought-title">
+          <div class="thought-copy">
+            <p class="kicker">Self-thought channel</p>
+            <h2 id="thought-title">Become the thought</h2>
+            <p>
+              Give the robot its next first-person thought. It stays active until
+              Hold or Autonomous. Jev steers continuous motion and joint posture
+              in Full control, or chooses named moves in Primitives.
+            </p>
+          </div>
+
+          <form id="thought-form" class="thought-form">
+            <label for="thought-input">What am I thinking now?</label>
+            <div class="composer-row">
+              <input
+                id="thought-input"
+                name="thought"
+                type="text"
+                autocomplete="off"
+                maxlength="1000"
+                placeholder="I should turn left and head toward the new goal"
+                disabled
+              />
+              <button class="button primary" type="submit">Become this thought</button>
+            </div>
+            <p class="form-status" id="thought-status" aria-live="polite">
+              Autonomous intent is active.
+            </p>
+          </form>
+
+          <div class="quick-thoughts" aria-label="Quick self-thoughts">
+            <button class="button secondary" type="button" data-thought="I should go forward carefully">W Forward</button>
+            <button class="button secondary" type="button" data-thought="I should turn left">A Turn left</button>
+            <button class="button secondary" type="button" data-thought="I should turn right">D Turn right</button>
+            <button class="button secondary" type="button" data-thought="I should step left">Q Step left</button>
+            <button class="button secondary" type="button" data-thought="I should step right">E Step right</button>
+            <button class="button secondary" type="button" data-thought="I should stop and hold position">S Hold</button>
+            <button class="button secondary" type="button" data-thought="I want to wave hello">Wave</button>
+            <button class="button secondary" type="button" data-thought="I should walk backward carefully">Back</button>
+            <button class="button secondary" type="button" data-thought="I should walk fast toward my goal">Fast</button>
+            <button class="button secondary" type="button" data-thought="I should crouch and hold low">Crouch</button>
+            <button class="button secondary" type="button" data-thought="I should do squats">Squat</button>
+            <button class="button secondary" type="button" data-thought="I should bow">Bow</button>
+            <button class="button secondary" type="button" data-thought="I should wave left hand">Wave left</button>
+            <button class="button secondary" type="button" data-thought="I should raise both arms">Arms up</button>
+            <button class="button secondary" type="button" data-thought="I should reach forward">Reach</button>
+            <button class="button secondary" type="button" data-thought="I should point left">Point</button>
+            <button class="button secondary" type="button" data-thought="I should dance">Dance</button>
+            <button class="button secondary" type="button" data-thought="I should march in place">March</button>
+            <button class="button secondary" type="button" data-thought="I should hop once">Hop once</button>
+            <button class="button tertiary" type="button" id="release-thought">Autonomous</button>
+            <button class="button tertiary" type="button" id="reset-robot">Reset pose</button>
+          </div>
+        </section>
+      </section>
+
+      <aside class="mind-column" aria-labelledby="mind-title">
+        <div class="mind-heading">
+          <div>
+            <p class="kicker">Cognition trace</p>
+            <h2 id="mind-title">The head</h2>
+          </div>
+          <p class="disclosure">Structured decisions, plans, and state. No hidden chain-of-thought.</p>
+        </div>
+
+        <ol class="cognition-trace">
+          <li class="trace-node self-node">
+            <div class="node-index">I</div>
+            <div>
+              <p class="node-label">Active self-thought</p>
+              <p class="node-value" id="self-thought">I am pursuing my autonomous goal.</p>
+            </div>
+          </li>
+          <li class="trace-node system-two-node">
+            <div class="node-index">2</div>
+            <div>
+              <p class="node-label"><span id="gemini-state">WAIT</span> Gemini // System 2</p>
+              <h3 id="plan-goal">Building the first plan</h3>
+              <p class="node-value" id="plan-strategy">Waiting for the first world-state event.</p>
+              <p class="mind-note" id="mind-note">Watching the scene.</p>
+            </div>
+          </li>
+          <li class="trace-node system-one-node">
+            <div class="node-index">1</div>
+            <div>
+              <p class="node-label"><span id="jev-state">WAIT</span> JEV // System 1</p>
+              <div class="decision-line">
+                <strong id="decision-action">STAND</strong>
+                <span id="decision-confidence">0% confidence</span>
+              </div>
+              <div class="probabilities" id="probabilities" aria-label="JEV motor decision details"></div>
+            </div>
+          </li>
+          <li class="trace-node motor-node">
+            <div class="node-index">M</div>
+            <div>
+              <p class="node-label">Motion controller</p>
+              <p class="node-value"><span id="motor-source">LOCAL</span> controls <span id="actuator-count">29</span> joints in <span id="motor-action">STAND</span> mode. PD applies torques at <span id="motor-hz">0</span> Hz.</p>
+              <p class="mind-note" id="motor-mode-note">Waiting for JEV's continuous motion command. The local gait policy handles foot timing and balance.</p>
+            </div>
+          </li>
+        </ol>
+
+        <details class="actuator-panel">
+          <summary>JEV joint offsets <span id="joint-target-count">0 / 29</span></summary>
+          <div class="joint-target-grid" id="joint-targets">Waiting for Jev's first continuous motor command.</div>
+        </details>
+
+        <section class="event-section" aria-labelledby="event-title">
+          <div class="event-heading">
+            <h3 id="event-title">Mind stream</h3>
+            <span>Newest last</span>
+          </div>
+          <ol class="event-log" id="event-log" aria-live="polite">
+            <li class="event empty">Waiting for the first event.</li>
+          </ol>
+        </section>
+      </aside>
+    </main>
+  </body>
+</html>
