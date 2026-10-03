@@ -2,11 +2,9 @@
 
 # JEV robot
 
-**Two model loops. One simulated humanoid. Every joint visible.**
-
 A Unitree G1 in MuJoCo, with JEV making motor decisions and Gemini planning from the live scene.
 
-[![Checks](https://github.com/arterialist/jev-robot/actions/workflows/ci.yml/badge.svg)](https://github.com/arterialist/jev-robot/actions/workflows/ci.yml)
+[![Checks](https://github.com/arterialist/jev-robot/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/arterialist/jev-robot/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white)](https://github.com/arterialist/jev-robot/blob/main/pyproject.toml)
 [![MuJoCo](https://img.shields.io/badge/physics-MuJoCo-4CB6AC)](https://mujoco.org/)
 [![License](https://img.shields.io/badge/license-MIT-D4A85F)](LICENSE)
@@ -14,11 +12,13 @@ A Unitree G1 in MuJoCo, with JEV making motor decisions and Gemini planning from
 
 [Get started](#try-it-without-api-keys) · [Running guide](docs/running.md) · [Architecture](docs/architecture.md) · [Contribute](CONTRIBUTING.md)
 
-![The browser control room in offline mode with the live G1 arena, goal map, model status, and joint telemetry](docs/assets/control-room.png)
+![Offline control room with the Follow camera, goal map, measured update rates, and local model status](docs/assets/control-room-overview.png)
+
+_Offline mode with local fallback decisions._
 
 </div>
 
-Click a point on the arena map and watch the G1 work toward it. Switch to its first-person camera, give it an explicit thought, or inspect the requested velocities and all 29 joint targets as the simulation runs. The control room shows model latency and measured update rates, so slow remote decisions remain visible.
+Click a point on the map to move the goal. The G1 then tries to reach it through the obstacle arena. You can switch to its first-person camera or give it an explicit thought such as "I should turn left." The control room shows requested velocities, all 29 joint targets, model latency, and measured update rates.
 
 ## Try it without API keys
 
@@ -51,7 +51,7 @@ cp .env.example .env
 uv run jev-robot-web
 ```
 
-The code defaults to `~typesafe/jev-latest` through OpenRouter's Decisions API and `gemini-3.8-flash` through Google's GenAI SDK. You can override both in `.env`. Each loop falls back independently when its key is missing or its request fails. Check the model status in the control room to see which source is active. Remote API calls may incur provider charges.
+The code uses `~typesafe/jev-latest` through OpenRouter's Decisions API and `gemini-3.8-flash` through Google's GenAI SDK by default. You can override both in `.env`. If a key is missing or a request fails, that loop uses local fallback decisions. The control room shows which source is active. Remote API calls may incur provider charges.
 
 ## Drive and inspect
 
@@ -64,10 +64,12 @@ The code defaults to `~typesafe/jev-latest` through OpenRouter's Decisions API a
 | Thought field or W/A/D/Q/E/S | Set the robot's active first-person intent. It stays active until replaced or released with Autonomous. |
 | Reset pose | Return the robot to its starting pose. A fall otherwise remains in the simulation. |
 
-The visible thought is user-supplied intent, and the model's status note is a short public output. The interface does not expose private chain-of-thought.
+You supply the active thought through the interface. The model also produces a short public status note. Private chain-of-thought is not exposed.
 
 <details>
-<summary>View the simulated arena</summary>
+<summary>More views of the offline demo</summary>
+
+![The complete offline control room with self-thought controls and cognition trace](docs/assets/control-room.png)
 
 ![The Unitree G1 in an offline MuJoCo run with red obstacles and a green goal](docs/assets/g1-arena.png)
 
@@ -97,11 +99,11 @@ JEV workers take the newest available observation. A completed response cannot r
 
 ## What this demo can and cannot do
 
-This is a simulation prototype. The G1's contacts, rigid-body dynamics, and actuator limits come from the Unitree model. A local ONNX policy produces walking targets; JEV chooses numeric velocity levels and shapes those targets with joint offsets. It does not generate every torque or learn a gait during the run.
+The G1's contacts, rigid-body dynamics, and actuator limits come from the Unitree model. A local ONNX policy produces walking targets. JEV chooses numeric velocity levels and adds joint offsets to those targets. It does not generate every torque or learn a gait during the run.
 
 The robot can fall, stall, or collide. Short motion projections suppress unsafe translation, but they do not prove a collision-free route. Repeated hopping is unstable. There is no scripted route or lap reset, and the controller does not overwrite root velocity or apply a hidden pelvis force. MuJoCo's numerical-instability guard can still restore a broken state.
 
-The project has no physical robot integration. Physics and ONNX inference run locally on CPU; JEV and Gemini run through remote APIs when enabled. The web server binds to loopback by default and has no authentication. Keep it local unless you add access controls.
+The project runs in simulation and has no physical robot integration. Physics and ONNX inference run locally on CPU. JEV and Gemini use remote APIs when enabled. The web server binds to loopback by default and has no authentication. Keep it local unless you add access controls.
 
 ## Project guide
 

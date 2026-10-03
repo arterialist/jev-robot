@@ -1,6 +1,6 @@
 # Contributing
 
-JEV robot is a simulation experiment with a browser control room. Contributions should make its behavior easier to reproduce, measure, and understand. Keep claims about model control tied to what the code and recorded runs actually show.
+JEV robot is a simulation experiment with a browser control room. Help make its experiments reproducible. When describing model control, report what the code and recorded runs show.
 
 ## Set up a checkout
 
@@ -27,13 +27,13 @@ uv build --no-sources
 
 On Linux, install EGL and OpenGL runtime libraries and set `MUJOCO_GL=egl` for headless rendering. On macOS, use `./scripts/run-macos` for the passive MuJoCo viewer. The browser demo runs with the regular Python launcher.
 
-CI checks the locked dependencies and offline tests on Python 3.12 and 3.13 on Linux, plus Python 3.12 on macOS. It also runs a short Linux simulation, renders a frame, builds a wheel and source archive, and verifies that the wheel contains the browser assets. The frame and package files are available as workflow artifacts. CI does not call JEV or Gemini.
+CI runs the offline tests with locked dependencies on Python 3.12 and 3.13 on Linux, plus Python 3.12 on macOS. It also runs a short Linux simulation and saves a rendered frame. The packaging job builds a wheel and source archive, then checks that the wheel contains the browser assets. A separate job builds the development container. The frame and package files are available as workflow artifacts. CI does not call JEV or Gemini.
 
-If you change a controller decision, add a test for the specific failure or behavior. If you change the interface, check the controls in a browser and attach a screenshot or recording. Report the model mode, motor mode, launch command, and any measurements needed to reproduce the result. A stable offline run does not establish live model latency or performance.
+If you change a controller decision, test the specific failure or behavior. For an interface change, check the controls in a browser and attach a screenshot or recording. Report the model mode, motor mode, launch command, and measurements needed to reproduce the result. Measure live model latency and performance in a live run.
 
 ## Submit a pull request
 
-Keep each pull request focused. Explain the concrete problem, what the change does, and how you checked it. Update the README when commands or public behavior change. Dependency changes should include `pyproject.toml` and the resulting `uv.lock` together.
+Keep each pull request focused. Explain the problem and the resulting behavior, then describe how you checked the change. Update the README when commands or public behavior change. Include `pyproject.toml` and the resulting `uv.lock` together when changing dependencies.
 
 New GitHub Actions must use a full commit SHA with the release version in a comment. Give workflows only the permissions they need. Package publication and deployment require a separate maintainer decision.
 

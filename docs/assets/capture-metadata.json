@@ -49,6 +49,33 @@
       "simulation_time": 172.52600000009568,
       "offline": true,
       "fallen": false
+    },
+    "control-room-overview.png": {
+      "source": "Direct Chrome CUA viewport screenshot, saved as PNG without resize or raster edits",
+      "dimensions": [
+        1600,
+        900
+      ],
+      "css_viewport": [
+        1600,
+        900
+      ],
+      "camera": "follow",
+      "offline": true,
+      "simulation_time": 631.95,
+      "explicit_reset_before_capture": true,
+      "visible_sections": [
+        "header",
+        "camera controls",
+        "motor mode controls",
+        "simulator frame",
+        "interactive map",
+        "all loop metrics",
+        "LOCAL cognition trace"
+      ],
+      "cropped_sections": [
+        "self-thought input and movement controls below fold"
+      ]
     }
   }
 }

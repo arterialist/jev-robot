@@ -408,16 +408,19 @@ def create_app(runtime: RobotRuntime) -> FastAPI:
     async def goal(request: GoalRequest) -> JSONResponse:
         try:
             runtime.set_goal(request.x, request.y)
-        except ValueError as error:
-            return JSONResponse({"error": str(error)}, status_code=422)
+        except ValueError:
+            return JSONResponse(
+                {"error": "Select a point inside the arena, clear of obstacles"},
+                status_code=422,
+            )
         return JSONResponse({"accepted": True})
 
     @app.post("/api/camera")
     async def camera(request: CameraRequest) -> JSONResponse:
         try:
             runtime.set_camera(request.view)
-        except ValueError as error:
-            return JSONResponse({"error": str(error)}, status_code=422)
+        except ValueError:
+            return JSONResponse({"error": "Unknown camera view"}, status_code=422)
         return JSONResponse({"accepted": True})
 
     @app.post("/api/control-mode")

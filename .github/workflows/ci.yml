@@ -66,6 +66,18 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  devcontainer:
+    name: Build dev container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the documented development image
+        run: docker build --pull --tag jev-robot-devcheck --file .devcontainer/Dockerfile .
+
   build:
     name: Build package
     runs-on: ubuntu-latest

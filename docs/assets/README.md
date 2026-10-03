@@ -4,6 +4,8 @@ The images show the local simulator in offline mode. The model loops use determi
 
 `control-room.png` is a full-page browser screenshot of the control room with the Arena camera selected. It shows the G1 near the green goal, the map, measured loop rates, self-thought controls, and cognition trace. The dashboard labels both model loops `LOCAL` and reports zero model throughput.
 
+`control-room-overview.png` is a direct 1600 by 900 browser screenshot with the Follow camera selected. It shows the robot, map, camera and motor-mode controls, measured rates, and `LOCAL` model labels. The self-thought input and movement buttons continue below the viewport; the full-page capture includes them. The capture followed an explicit Reset pose after the long-running offline robot fell. The temporary browser viewport was restored afterward.
+
 `g1-arena.png` is a frame from the same run with the Follow camera selected. It shows the upright G1, physical obstacles, arena walls, and green goal marker. The capture preserves the rendered frame; converting its JPEG stream frame to PNG does not add detail.
 
 `social-preview.png` is a direct MuJoCo render at 1280 by 640 pixels for GitHub's social preview. It uses the local runtime's reported position, orientation, and all 29 joint positions in the same scene with the Follow camera. MuJoCo renders the image at its final dimensions; the image has no added illustration or raster resizing.

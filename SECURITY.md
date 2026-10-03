@@ -10,9 +10,9 @@ If a credential has been exposed, revoke or rotate it at its provider before con
 
 ## Local demo boundaries
 
-The web server binds to `127.0.0.1` by default. Its controls are intended for a local simulation and do not provide authentication. Keep it local unless you add access controls appropriate for the deployment.
+The web server binds to `127.0.0.1` by default and has no authentication. Keep it local unless you add access controls.
 
-JEV and Gemini receive the robot state, task, and active self-thought during live runs. Gemini also receives the rendered camera frame. Use `--offline` when you want both model loops to run locally without model API calls. Offline mode still downloads the official Unitree simulation assets on the first run.
+JEV and Gemini receive the robot state, task, and active self-thought during live runs. In browser mode, Gemini also receives the rendered camera frame. Use `--offline` to run both loops with local fallback decisions and no model API calls. The first offline run still downloads uncached Unitree assets.
 
 Keep API keys in a local `.env` or shell environment. Do not include them in issues, screenshots, recordings, browser traces, or commits.
 

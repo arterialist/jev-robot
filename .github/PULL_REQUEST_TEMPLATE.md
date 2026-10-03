@@ -1,4 +1,4 @@
-## What changes?
+## Change
 
 Describe the problem and the resulting behavior. Link the relevant issue if there is one.
 
@@ -14,4 +14,4 @@ Record the commands you ran and their results. For a browser or robot behavior c
 
 ## Limits or follow-up
 
-Describe known limitations or measurements that still need a live model run. An offline run verifies local behavior; it does not establish JEV or Gemini performance.
+Describe known limitations or measurements that still need a live model run. Report JEV or Gemini performance only if you measured it with live API calls.

@@ -1,6 +1,6 @@
 # Running JEV robot
 
-The browser control room is the easiest way to explore the simulation. The command-line entry point also supports a native MuJoCo viewer, headless runs, and a final PNG capture.
+Start with the browser control room to explore the simulation. Use the command-line entry point for the native MuJoCo viewer, headless runs, or a final PNG capture.
 
 ## Install
 
@@ -12,7 +12,7 @@ cd jev-robot
 uv sync --python 3.12
 ```
 
-`uv sync` installs the project and dependencies into `.venv`. The first simulation run clones the G1 assets and a pinned Unitree gait policy into the platform's user cache. Offline mode disables model APIs, but does not disable these initial downloads. Later runs reuse the cached files.
+`uv sync` installs the project and dependencies into `.venv`. The first simulation run downloads the G1 assets and a pinned Unitree gait policy into the platform's user cache. This download also happens in offline mode. Later runs reuse the cached files.
 
 ## Browser control room
 
@@ -35,7 +35,7 @@ uv run jev-robot-web --task "Reach the green target and hold position"
 | `--offline` | Off | Disable JEV and Gemini API calls |
 | `--no-open` | Off | Skip automatic browser launch |
 
-The server has no authentication. Its HTTP endpoints and WebSocket can change the goal, intent, camera, and pose. The default loopback address keeps it on your computer. Binding to a network interface requires your own access controls.
+The server has no authentication. Its HTTP endpoints and WebSocket can change the goal, intent, camera, and pose. The default loopback address keeps it on your computer. Add access controls before exposing it on a network.
 
 ### Controls
 
@@ -86,9 +86,9 @@ Get an [OpenRouter API key](https://openrouter.ai/settings/keys) for JEV and a [
 | `JEV_MODEL` | `~typesafe/jev-latest` | Decisions API model identifier |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model identifier |
 
-These names are the defaults in this repository, not a guarantee of provider availability. A model override must support the corresponding API contract. JEV uses typed Decisions questions; Gemini uses structured JSON output and, in browser mode, image input.
+Provider availability can change. A model override must support the API used by its loop. JEV uses typed Decisions questions. Gemini uses structured JSON output and, in browser mode, image input.
 
-The keys are independent. You can enable either loop alone. Missing credentials or request errors activate that loop's local fallback; the browser shows configuration, active source, and error type. API calls can incur charges. The three JEV workers may make concurrent requests throughout an online run.
+You can enable either loop alone. Missing credentials or request errors activate that loop's local fallback. The browser shows the configuration, active source, and last error. API calls can incur charges, and the three JEV workers may make concurrent requests throughout an online run.
 
 ## Native viewer and headless runs
 
@@ -129,7 +129,7 @@ macOS requires MuJoCo's `mjpython` launcher for the passive native viewer. `scri
 
 The browser runtime also renders frames locally. A Linux desktop needs an available OpenGL context. On a Linux server, choose an appropriate MuJoCo rendering backend and install its system dependencies before starting the browser or requesting a capture. For example, `MUJOCO_GL=egl` selects EGL where the host has a working EGL driver. See [MuJoCo's Python documentation](https://mujoco.readthedocs.io/en/stable/python.html) for the supported backends.
 
-The plain headless smoke command does not create a viewer or renderer. It is the first check to run when a graphics setup fails. This project was developed on macOS; other platforms may need additional graphics configuration.
+The plain headless smoke command does not create a viewer or renderer. Run it first when a graphics setup fails. The project was developed on macOS. Its local Linux dev container has also passed an offline simulation with EGL rendering.
 
 ### GitHub Codespaces
 
@@ -141,7 +141,7 @@ uv run jev-robot-web --offline --no-open --host 0.0.0.0
 
 Open the forwarded port from the Ports panel and keep its visibility private. The browser UI works through that forwarded port; the native MuJoCo viewer is unavailable in Codespaces. Live models require your own credentials, supplied as Codespaces secrets or a local `.env` file.
 
-The configuration is provided for reproducible setup. A hosted Codespaces session has not been validated as part of this project's local checks.
+The Linux dev-container image has been built locally, and its offline simulation passed with EGL rendering. A hosted Codespaces session has not been launched.
 
 ## Asset cache
 

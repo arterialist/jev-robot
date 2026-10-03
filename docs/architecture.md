@@ -4,13 +4,13 @@ JEV robot combines slow remote model decisions with local locomotion and torque 
 
 ## Model loops
 
-`CognitiveArchitecture` publishes each `WorldState` to separate bounded LIFO queues. Three JEV worker threads consume the newest available observation; one Gemini thread consumes state for planning. Each worker drains older pending observations rather than working through a FIFO backlog.
+`CognitiveArchitecture` publishes each `WorldState` to separate bounded LIFO queues. Three JEV worker threads consume the newest available observation. One Gemini thread reads state for planning. Each worker drains older pending observations so they do not form a backlog.
 
 The state contains position, orientation, velocity, joint positions and velocities, target distance and bearing, obstacle geometry, wall clearance, arrival state, and the current action. JEV also receives Gemini's latest structured plan and the active thought. Gemini receives its previous plan, the state, and the active thought. In browser mode it also receives the current rendered JPEG.
 
 A JEV result only replaces the current decision if its observation time is newer. Changing the goal, thought, or control mode increments a decision generation so an old request cannot overwrite the new intent. Gemini also rejects a completed plan if its thought, mode, or target is stale.
 
-The explicit thought is an input supplied through the interface. The prompts present it as the robot's immediate first-person intent. It is not evidence that the model produced a thought autonomously. The visible `mind_note` is a short public status output, not hidden reasoning.
+The user supplies the explicit thought through the interface. The prompts present it as the robot's immediate first-person intent. The model does not generate that input autonomously. The visible `mind_note` is a short public status output. It does not contain hidden reasoning.
 
 ### JEV full control
 
@@ -20,7 +20,7 @@ The JEV client sends typed questions to `https://openrouter.ai/api/alpha/decisio
 - Twenty-nine Score questions return probabilities over nine bounded offsets for each joint.
 - A Noul question reports immediate fall or collision risk.
 
-The client computes each joint offset as the probability-weighted average of its candidate angles. It validates scores and probability totals before accepting the result. Full control therefore means numeric velocity selection and an offset for every joint, with a local gait policy still responsible for step timing and balance.
+The client computes each joint offset as the probability-weighted average of its candidate angles. It validates scores and probability totals before accepting the result. In Full control, JEV selects numeric velocities and an offset for every joint. The local gait policy handles step timing and balance.
 
 Velocity choices range from -0.22 to 0.45 m/s forward, -0.25 to 0.25 m/s lateral, and -0.70 to 0.70 rad/s yaw. Joint-offset bounds depend on the joint. These commands shape the current gait targets; they are not direct torque predictions.
 
@@ -70,7 +70,7 @@ Arrival latches when target distance drops below 0.48 m. Travel then stops unles
 
 The browser renderer has its own `MjData` and copies the current pose from the physics thread. It streams JPEG frames over MJPEG. The WebSocket carries controls and telemetry; HTTP endpoints provide equivalent controls and a state snapshot.
 
-The dashboard reports measured rates, not only configured targets. Physics, sensory, and frame rates use recent timestamp samples spanning roughly two seconds. JEV uses a ten-second accepted-completion window, and Gemini uses a 30-second accepted-completion window. Decision age is the difference between the current simulation time and the applied decision's observation time, displayed in simulated milliseconds.
+The dashboard shows measured rates alongside their configured targets. Physics, sensory, and frame rates use recent timestamp samples spanning roughly two seconds. JEV counts accepted completions over ten seconds. Gemini counts them over 30 seconds. Decision age is the difference between the current simulation time and the applied decision's observation time, displayed in simulated milliseconds.
 
 Three concurrent requests can increase throughput. They cannot make a remote model respond at the 500 Hz physics rate. The controller holds the latest accepted command while physics continues.
 

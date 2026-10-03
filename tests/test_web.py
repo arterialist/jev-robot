@@ -5,6 +5,7 @@ from __future__ import annotations
 import queue
 import threading
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -64,14 +65,17 @@ class BrowserApiTests(unittest.TestCase):
     def test_goal_validation_and_command_queue(self):
         response = self.client.post("/api/goal", json={"x": 0.85, "y": 0.50})
         self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json(),
+                         {"error": "Select a point inside the arena, clear of obstacles"})
         self.assertTrue(self.runtime._commands.empty())
         response = self.client.post("/api/goal", json={"x": 2.5, "y": -0.45})
         self.assertEqual(response.json(), {"accepted": True})
         self.assertEqual(self.runtime._commands.get_nowait(), ("goal", (2.5, -0.45)))
 
     def test_camera_and_control_mode_validation(self):
-        self.assertEqual(self.client.post("/api/camera", json={"view": "invalid"}).status_code,
-                         422)
+        response = self.client.post("/api/camera", json={"view": "invalid"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json(), {"error": "Unknown camera view"})
         self.assertEqual(self.client.post("/api/camera", json={"view": "fpv"}).status_code,
                          200)
         self.assertEqual(self.runtime._camera_view, "fpv")
@@ -85,6 +89,19 @@ class BrowserApiTests(unittest.TestCase):
         self.assertTrue(self.runtime._commands.empty())
         self.assertEqual(self.client.post("/api/reset").json(), {"accepted": True})
         self.assertEqual(self.runtime._commands.get_nowait(), ("reset", None))
+
+    def test_validation_errors_do_not_expose_runtime_details(self):
+        cases = (
+            ("/api/goal", "set_goal", {"x": 2.5, "y": -0.45}),
+            ("/api/camera", "set_camera", {"view": "fpv"}),
+        )
+        for path, method, payload in cases:
+            with self.subTest(path=path):
+                with patch.object(self.runtime, method,
+                                  side_effect=ValueError("private runtime detail")):
+                    response = self.client.post(path, json=payload)
+                self.assertEqual(response.status_code, 422)
+                self.assertNotIn("private runtime detail", response.text)
 
 
 if __name__ == "__main__":
